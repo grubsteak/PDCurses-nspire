@@ -1,0 +1,35 @@
+SDL_INCLUDE=/usr/include/SDL
+INCL_FILES= jpeglib.h   \
+			jmorecfg.h  \
+			jconfig.h   \
+			jerror.h    \
+			pngconf.h   \
+			png.h       \
+			SDL_gfxPrimitives.h \
+			SDL_rotozoom.h      \
+			SDL_framerate.h     \
+			SDL_imageFilter.h   \
+			SDL_gfxBlitFunc.h \
+			SDL_gfxPrimitives.h \
+			SDL_rotozoom.h \
+			SDL_framerate.h \
+			SDL_imageFilter.h \
+			SDL_gfxBlitFunc.h \
+			SDL_image.h
+
+CC=gcc
+CXX=g++
+AS=as
+LD=ld
+AR=arm-none-eabi-ar
+STRIP=arm-none-eabi-strip
+
+BUILTIN_LIBS += libSDL.a libSDL_image.a libSDL_gfx.a libjpeg.a libpng.a libz.a
+
+platform-clean:
+
+./include: $(SDL_INCLUDE)
+	@mkdir -p include
+	@cp -ar $(foreach file, $(INCLUDE), /usr/include/$(file)) $(SDL_INCLUDE)/* include
+	@ln -snf include include/SDL
+
