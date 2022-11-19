@@ -1,0 +1,27 @@
+SDL_STATIC_LIBS=libSDL.a libSDL_image.a libSDL_gfx.a libjpeg.a libpng.a
+SDL_INCLUDE=nSDL/include
+
+CC=nspire-gcc
+CXX=nspire-g++
+AS=nspire-as
+LD=nspire-ld
+AR=nspire-ar
+STRIP=arm-none-eabi-strip
+
+BUILTIN_LIBS=libz.a
+
+.PHONY: sdl-make
+
+$(SDL_STATIC_LIBS): sdl-make
+	@mkdir -p lib
+	cp -a nSDL/$@ ./lib/$@
+
+sdl-make:
+	cd nSDL && make -f Makefile.nsp
+
+platform-clean:
+	@echo nspire plat clean
+	cd nSDL && echo $(PWD);  make -f Makefile.nsp clean
+
+./include: $(SDL_INCLUDE)
+	@cp -ar $(SDL_INCLUDE) $@
