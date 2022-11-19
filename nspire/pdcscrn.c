@@ -112,8 +112,8 @@ int PDC_scr_open(int argc, char **argv) {
         pdc_flastc = pdc_font->format->palette->ncolors - 1;
 
     if (pdc_own_screen && !pdc_icon) {
-        const char *iname = getenv("PDC_ICON");
-        pdc_icon = SDL_LoadBMP(iname ? iname : "pdcicon.bmp");
+        // const char *iname = getenv("PDC_ICON");
+        // pdc_icon = SDL_LoadBMP(iname ? iname : "pdcicon.bmp");
 
         if (!pdc_icon)
             pdc_icon = SDL_LoadBMP_RW(SDL_RWFromMem(deficon,
