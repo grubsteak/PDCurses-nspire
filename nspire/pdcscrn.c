@@ -93,10 +93,10 @@ int PDC_scr_open(int argc, char **argv) {
 
     SP->mono = !pdc_font->format->palette;
 
-    if (!SP->mono && !pdc_back) {
-        const char *bname = getenv("PDC_BACKGROUND");
-        pdc_back = SDL_LoadBMP(bname ? bname : "pdcback.bmp");
-    }
+    // if (!SP->mono && !pdc_back) {
+    //     const char *bname = getenv("PDC_BACKGROUND");
+    //     pdc_back = SDL_LoadBMP(bname ? bname : "pdcback.bmp");
+    // }
 
     if (!SP->mono && (pdc_back || !pdc_own_screen)) {
         SP->orig_attr = PDC_TRUE;
