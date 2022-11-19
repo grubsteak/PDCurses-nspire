@@ -80,7 +80,7 @@ int PDC_scr_open(int argc, char **argv) {
 
     if (!pdc_font) {
         const char *fname = getenv("PDC_FONT");
-        pdc_font = SDL_LoadBMP(fname ? fname : "pdcfont.bmp");
+        pdc_font = SDL_LoadBMP(fname ? fname : "pdcfont.bmp.tns");
     }
 
     if (!pdc_font)
