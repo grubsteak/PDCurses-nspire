@@ -45,14 +45,10 @@ sdltest
 
 all: libs demos
 
-install-special-sdl:
-	cd SDL; make install
-
 libs:	$(LIBCURSES)
 
 clean:
 	-rm -rf *.o trace $(LIBCURSES) $(DEMOS)
-	cd SDL; make clean
 
 demos:	$(DEMOS)
 	arm-none-eabi-strip $(DEMOS)
