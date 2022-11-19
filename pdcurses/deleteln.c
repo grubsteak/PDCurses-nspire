@@ -1,55 +1,50 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-deleteln
---------
+  Name:                                                         deleteln
 
-### Synopsis
+  Synopsis:
+        int deleteln(void);
+        int wdeleteln(WINDOW *win);
+        int insdelln(int n);
+        int winsdelln(WINDOW *win, int n);
+        int insertln(void);
+        int winsertln(WINDOW *win);
 
-    int deleteln(void);
-    int wdeleteln(WINDOW *win);
-    int insdelln(int n);
-    int winsdelln(WINDOW *win, int n);
-    int insertln(void);
-    int winsertln(WINDOW *win);
+        int mvdeleteln(int y, int x);
+        int mvwdeleteln(WINDOW *win, int y, int x);
+        int mvinsertln(int y, int x);
+        int mvwinsertln(WINDOW *win, int y, int x);
 
-    int mvdeleteln(int y, int x);
-    int mvwdeleteln(WINDOW *win, int y, int x);
-    int mvinsertln(int y, int x);
-    int mvwinsertln(WINDOW *win, int y, int x);
+  Description:
+        With the deleteln() and wdeleteln() functions, the line under
+        the cursor in the window is deleted.  All lines below the
+        current line are moved up one line.  The bottom line of the
+        window is cleared.  The cursor position does not change.
 
-### Description
+        With the insertln() and winsertn() functions, a blank line is 
+        inserted above the current line and the bottom line is lost.
 
-   With the deleteln() and wdeleteln() functions, the line under the
-   cursor in the window is deleted. All lines below the current line are
-   moved up one line. The bottom line of the window is cleared. The
-   cursor position does not change.
+        mvdeleteln(), mvwdeleteln(), mvinsertln() and mvwinsertln() 
+        allow moving the cursor and inserting/deleting in one call.
 
-   With the insertln() and winsertn() functions, a blank line is
-   inserted above the current line and the bottom line is lost.
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   mvdeleteln(), mvwdeleteln(), mvinsertln() and mvwinsertln() allow
-   moving the cursor and inserting/deleting in one call.
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    deleteln                    Y       Y       Y
-    wdeleteln                   Y       Y       Y
-    mvdeleteln                  -       -       -
-    mvwdeleteln                 -       -       -
-    insdelln                    Y       Y       Y
-    winsdelln                   Y       Y       Y
-    insertln                    Y       Y       Y
-    winsertln                   Y       Y       Y
-    mvinsertln                  -       -       -
-    mvwinsertln                 -       -       -
+  Portability                                X/Open    BSD    SYS V
+        deleteln                                Y       Y       Y
+        wdeleteln                               Y       Y       Y
+        mvdeleteln                              -       -       -
+        mvwdeleteln                             -       -       -
+        insdelln                                Y       -      4.0
+        winsdelln                               Y       -      4.0
+        insertln                                Y       Y       Y
+        winsertln                               Y       Y       Y
+        mvinsertln                              -       -       -
+        mvwinsertln                             -       -       -
 
 **man-end****************************************************************/
 
@@ -79,7 +74,7 @@ int wdeleteln(WINDOW *win)
     for (ptr = temp; (ptr - temp < win->_maxx); ptr++)
         *ptr = blank;           /* make a blank line */
 
-    if (win->_cury <= win->_bmarg)
+    if (win->_cury <= win->_bmarg) 
     {
         win->_firstch[win->_bmarg] = 0;
         win->_lastch[win->_bmarg] = win->_maxx - 1;

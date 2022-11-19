@@ -1,44 +1,36 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-printw
-------
+  Name:                                                         printw
 
-### Synopsis
+  Synopsis:
+        int printw(const char *fmt, ...);
+        int wprintw(WINDOW *win, const char *fmt, ...);
+        int mvprintw(int y, int x, const char *fmt, ...);
+        int mvwprintw(WINDOW *win, int y, int x, const char *fmt,...);
+        int vwprintw(WINDOW *win, const char *fmt, va_list varglist);
+        int vw_printw(WINDOW *win, const char *fmt, va_list varglist);
 
-    int printw(const char *fmt, ...);
-    int wprintw(WINDOW *win, const char *fmt, ...);
-    int mvprintw(int y, int x, const char *fmt, ...);
-    int mvwprintw(WINDOW *win, int y, int x, const char *fmt,...);
-    int vwprintw(WINDOW *win, const char *fmt, va_list varglist);
-    int vw_printw(WINDOW *win, const char *fmt, va_list varglist);
+  Description:
+        The printw() functions add a formatted string to the window at 
+        the current or specified cursor position. The format strings are 
+        the same as used in the standard C library's printf(). (printw() 
+        can be used as a drop-in replacement for printf().)
 
-### Description
+  Return Value:
+        All functions return the number of characters printed, or 
+        ERR on error.
 
-   The printw() functions add a formatted string to the window at the
-   current or specified cursor position. The format strings are the same
-   as used in the standard C library's printf(). (printw() can be used
-   as a drop-in replacement for printf().)
-
-   The duplication between vwprintw() and vw_printw() is for historic
-   reasons. In PDCurses, they're the same.
-
-### Return Value
-
-   All functions return the number of characters printed, or ERR on
-   error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    printw                      Y       Y       Y
-    wprintw                     Y       Y       Y
-    mvprintw                    Y       Y       Y
-    mvwprintw                   Y       Y       Y
-    vwprintw                    Y       Y       Y
-    vw_printw                   Y       Y       Y
+  Portability                                X/Open    BSD    SYS V
+        printw                                  Y       Y       Y
+        wprintw                                 Y       Y       Y
+        mvprintw                                Y       Y       Y
+        mvwprintw                               Y       Y       Y
+        vwprintw                                Y       -      4.0
+        vw_printw                               Y
 
 **man-end****************************************************************/
 

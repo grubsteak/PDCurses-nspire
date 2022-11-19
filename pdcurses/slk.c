@@ -1,86 +1,81 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-slk
----
+  Name:                                                         slk
 
-### Synopsis
+  Synopsis:
+        int slk_init(int fmt);
+        int slk_set(int labnum, const char *label, int justify);
+        int slk_refresh(void);
+        int slk_noutrefresh(void);
+        char *slk_label(int labnum);
+        int slk_clear(void);
+        int slk_restore(void);
+        int slk_touch(void);
+        int slk_attron(const chtype attrs);
+        int slk_attr_on(const attr_t attrs, void *opts);
+        int slk_attrset(const chtype attrs);
+        int slk_attr_set(const attr_t attrs, short color_pair, void *opts);
+        int slk_attroff(const chtype attrs);
+        int slk_attr_off(const attr_t attrs, void *opts);
+        int slk_color(short color_pair);
 
-    int slk_init(int fmt);
-    int slk_set(int labnum, const char *label, int justify);
-    int slk_refresh(void);
-    int slk_noutrefresh(void);
-    char *slk_label(int labnum);
-    int slk_clear(void);
-    int slk_restore(void);
-    int slk_touch(void);
-    int slk_attron(const chtype attrs);
-    int slk_attr_on(const attr_t attrs, void *opts);
-    int slk_attrset(const chtype attrs);
-    int slk_attr_set(const attr_t attrs, short color_pair, void *opts);
-    int slk_attroff(const chtype attrs);
-    int slk_attr_off(const attr_t attrs, void *opts);
-    int slk_color(short color_pair);
+        int slk_wset(int labnum, const wchar_t *label, int justify);
 
-    int slk_wset(int labnum, const wchar_t *label, int justify);
+        int PDC_mouse_in_slk(int y, int x);
+        void PDC_slk_free(void);
+        void PDC_slk_initialize(void);
 
-    int PDC_mouse_in_slk(int y, int x);
-    void PDC_slk_free(void);
-    void PDC_slk_initialize(void);
+        wchar_t *slk_wlabel(int labnum)
 
-    wchar_t *slk_wlabel(int labnum)
+  Description:
+        These functions manipulate a window that contain Soft Label Keys 
+        (SLK). To use the SLK functions, a call to slk_init() must be 
+        made BEFORE initscr() or newterm(). slk_init() removes 1 or 2 
+        lines from the useable screen, depending on the format selected.
 
-### Description
+        The line(s) removed from the screen are used as a separate 
+        window, in which SLKs are displayed.
 
-   These functions manipulate a window that contain Soft Label Keys
-   (SLK). To use the SLK functions, a call to slk_init() must be made
-   BEFORE initscr() or newterm(). slk_init() removes 1 or 2 lines from
-   the useable screen, depending on the format selected.
+        slk_init() requires a single parameter which describes the 
+        format of the SLKs as follows:
+ 
+                0       3-2-3 format
+                1       4-4 format
+                2       4-4-4 format (ncurses extension)
+                3       4-4-4 format with index line (ncurses extension)
+                        2 lines used
+                55      5-5 format (pdcurses format)
 
-   The line(s) removed from the screen are used as a separate window, in
-   which SLKs are displayed.
+        slk_refresh(), slk_noutrefresh() and slk_touch() are analogous
+        to refresh(), noutrefresh() and touch().
 
-   slk_init() requires a single parameter which describes the format of
-   the SLKs as follows:
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   0       3-2-3 format
-   1       4-4 format
-   2       4-4-4 format (ncurses extension)
-   3       4-4-4 format with index line (ncurses extension)
-   2 lines used
-   55      5-5 format (pdcurses format)
-
-   slk_refresh(), slk_noutrefresh() and slk_touch() are analogous to
-   refresh(), noutrefresh() and touch().
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    slk_init                    Y       Y       Y
-    slk_set                     Y       Y       Y
-    slk_refresh                 Y       Y       Y
-    slk_noutrefresh             Y       Y       Y
-    slk_label                   Y       Y       Y
-    slk_clear                   Y       Y       Y
-    slk_restore                 Y       Y       Y
-    slk_touch                   Y       Y       Y
-    slk_attron                  Y       Y       Y
-    slk_attrset                 Y       Y       Y
-    slk_attroff                 Y       Y       Y
-    slk_attr_on                 Y       Y       Y
-    slk_attr_set                Y       Y       Y
-    slk_attr_off                Y       Y       Y
-    slk_wset                    Y       Y       Y
-    PDC_mouse_in_slk            -       -       -
-    PDC_slk_free                -       -       -
-    PDC_slk_initialize          -       -       -
-    slk_wlabel                  -       -       -
+  Portability                                X/Open    BSD    SYS V
+        slk_init                                Y       -       Y
+        slk_set                                 Y       -       Y
+        slk_refresh                             Y       -       Y
+        slk_noutrefresh                         Y       -       Y
+        slk_label                               Y       -       Y
+        slk_clear                               Y       -       Y
+        slk_restore                             Y       -       Y
+        slk_touch                               Y       -       Y
+        slk_attron                              Y       -       Y
+        slk_attrset                             Y       -       Y
+        slk_attroff                             Y       -       Y
+        slk_attr_on                             Y
+        slk_attr_set                            Y
+        slk_attr_off                            Y
+        slk_wset                                Y
+        PDC_mouse_in_slk                        -       -       -
+        PDC_slk_free                            -       -       -
+        PDC_slk_initialize                      -       -       -
+        slk_wlabel                              -       -       -
 
 **man-end****************************************************************/
 
@@ -92,7 +87,7 @@ static int label_length = 0;
 static int labels = 0;
 static int label_fmt = 0;
 static int label_line = 0;
-static bool hidden = FALSE;
+static PDC_bool hidden = PDC_FALSE;
 
 static struct SLK {
     chtype label[32];
@@ -119,7 +114,7 @@ int slk_init(int fmt)
     if (SP)
         return ERR;
 
-    switch (fmt)
+    switch (fmt) 
     {
     case 0:  /* 3 - 2 - 3 */
         labels = LABEL_NORMAL;
@@ -221,7 +216,7 @@ int slk_set(int labnum, const char *label, int justify)
 
     labnum--;
 
-    if (!label || !(*label))
+    if (!label || !(*label)) 
     {
         /* Clear the label */
 
@@ -277,9 +272,6 @@ int slk_noutrefresh(void)
 {
     PDC_LOG(("slk_noutrefresh() - called\n"));
 
-    if (!SP)
-        return ERR;
-
     return wnoutrefresh(SP->slk_winptr);
 }
 
@@ -311,10 +303,7 @@ int slk_clear(void)
 {
     PDC_LOG(("slk_clear() - called\n"));
 
-    if (!SP)
-        return ERR;
-
-    hidden = TRUE;
+    hidden = PDC_TRUE;
     werase(SP->slk_winptr);
     return wrefresh(SP->slk_winptr);
 }
@@ -323,10 +312,7 @@ int slk_restore(void)
 {
     PDC_LOG(("slk_restore() - called\n"));
 
-    if (!SP)
-        return ERR;
-
-    hidden = FALSE;
+    hidden = PDC_FALSE;
     _redraw();
     return wrefresh(SP->slk_winptr);
 }
@@ -334,9 +320,6 @@ int slk_restore(void)
 int slk_touch(void)
 {
     PDC_LOG(("slk_touch() - called\n"));
-
-    if (!SP)
-        return ERR;
 
     return touchwin(SP->slk_winptr);
 }
@@ -346,9 +329,6 @@ int slk_attron(const chtype attrs)
     int rc;
 
     PDC_LOG(("slk_attron() - called\n"));
-
-    if (!SP)
-        return ERR;
 
     rc = wattron(SP->slk_winptr, attrs);
     _redraw();
@@ -369,9 +349,6 @@ int slk_attroff(const chtype attrs)
 
     PDC_LOG(("slk_attroff() - called\n"));
 
-    if (!SP)
-        return ERR;
-
     rc = wattroff(SP->slk_winptr, attrs);
     _redraw();
 
@@ -391,9 +368,6 @@ int slk_attrset(const chtype attrs)
 
     PDC_LOG(("slk_attrset() - called\n"));
 
-    if (!SP)
-        return ERR;
-
     rc = wattrset(SP->slk_winptr, attrs);
     _redraw();
 
@@ -405,9 +379,6 @@ int slk_color(short color_pair)
     int rc;
 
     PDC_LOG(("slk_color() - called\n"));
-
-    if (!SP)
-        return ERR;
 
     rc = wcolor_set(SP->slk_winptr, color_pair, NULL);
     _redraw();
@@ -460,7 +431,7 @@ static void _slk_calc(void)
             col += label_length;
 
             if (i == 3)
-                col = COLS - (label_length * 4) + 1;
+                col = COLS - (label_length * 4) + 1; 
         }
 
         break;
@@ -474,10 +445,10 @@ static void _slk_calc(void)
             col += label_length;
         }
 
-        center = COLS / 2;
+        center = COLS/2;
 
         slk[4].start_col = center - (label_length * 2) + 1;
-        slk[5].start_col = center - label_length + 1;
+        slk[5].start_col = center - label_length - 1;
         slk[6].start_col = center + 1;
         slk[7].start_col = center + label_length + 1;
 
@@ -524,9 +495,8 @@ void PDC_slk_initialize(void)
 
         if (!SP->slk_winptr)
         {
-            SP->slk_winptr = newwin(SP->slklines, COLS,
-                                    LINES - SP->slklines, 0);
-            if (!SP->slk_winptr)
+            if ( !(SP->slk_winptr = newwin(SP->slklines, COLS, 
+                                           LINES - SP->slklines, 0)) )
                 return;
 
             wattrset(SP->slk_winptr, A_REVERSE);
@@ -573,7 +543,7 @@ void PDC_slk_free(void)
         labels = 0;
         label_fmt = 0;
         label_line = 0;
-        hidden = FALSE;
+        hidden = PDC_FALSE;
     }
 }
 
@@ -583,7 +553,7 @@ int PDC_mouse_in_slk(int y, int x)
 
     PDC_LOG(("PDC_mouse_in_slk() - called: y->%d x->%d\n", y, x));
 
-    /* If the line on which the mouse was clicked is NOT the last line
+    /* If the line on which the mouse was clicked is NOT the last line 
        of the screen, we are not interested in it. */
 
     if (!slk || !SP->slk_winptr || (y != SP->slk_winptr->_begy + label_line))
@@ -606,7 +576,7 @@ int slk_wset(int labnum, const wchar_t *label, int justify)
 
     labnum--;
 
-    if (!label || !(*label))
+    if (!label || !(*label)) 
     {
         /* Clear the label */
 

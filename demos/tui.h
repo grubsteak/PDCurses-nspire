@@ -2,7 +2,7 @@
  * 'textual user interface'
  *
  * Author : P.J. Kunst <kunst@prl.philips.nl>
- * Date   : 1993-02-25
+ * Date   : 25-02-93
  */
 
 #ifndef _TUI_H_
@@ -21,7 +21,7 @@
 
 typedef void (*FUNC)(void);
 
-typedef struct
+typedef struct 
 {
     char *name; /* item label */
     FUNC  func; /* (pointer to) function */
@@ -42,7 +42,7 @@ void    bodymsg(char *msg);
 void    errormsg(char *msg);
 void    statusmsg(char *msg);
 
-bool    keypressed(void);
+PDC_bool    keypressed(void);
 int     getkey(void);
 int     waitforkey(void);
 

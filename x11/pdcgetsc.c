@@ -1,4 +1,4 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include "pdcx11.h"
 
@@ -8,7 +8,7 @@ int PDC_get_columns(void)
 {
     PDC_LOG(("PDC_get_columns() - called\n"));
 
-    return pdc_wwidth / pdc_fwidth;
+    return XCursesCOLS;
 }
 
 /* get the cursor size/shape */
@@ -24,5 +24,5 @@ int PDC_get_rows(void)
 {
     PDC_LOG(("PDC_get_rows() - called\n"));
 
-    return pdc_wheight / pdc_fheight;
+    return XCursesLINES;
 }

@@ -3,12 +3,13 @@
 # The idea to this kind of setup info script was stolen from numerous
 # other packages, such as neon, libxml and gnome.
 #
+# $Id: xcurses-config.in,v 1.6 2007/11/07 23:33:07 wmcbrine Exp $
+#
 
-verdot=@PACKAGE_VERSION@
+verdot=3.4
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-libdir=@libdir@
 includedir=@includedir@/xcurses
 
 usage()
@@ -19,11 +20,9 @@ usage()
     echo ""
     echo "  --help         display this help and exit"
     echo "  --cflags       pre-processor and compiler flags"
-    echo "                 [-I$includedir @PDC_WIDE@]"
+    echo "                 [-I$includedir]"
     echo "  --libs         library linking information"
-    echo "                 [-L$libdir -lXCurses @LDFLAGS@ @MH_EXTRA_LIBS@"
-    echo "  --libs-static  static library linking information (libXCurses only)"
-    echo "                 [$libdir/libXCurses.a @LDFLAGS@ @MH_XLIBS@ @MH_EXTRA_LIBS@"
+    echo "                 [-L$prefix/lib -lXCurses @LDFLAGS@ @MH_XLIBS@ @MH_EXTRA_LIBS@"
     echo "  --prefix       PDCurses install prefix"
     echo "                 [$prefix]"
     echo "  --version      output version information"
@@ -59,15 +58,11 @@ while test $# -gt 0; do
        ;;
 
     --cflags)
-       echo -I$includedir @PDC_WIDE@
+       echo -I$includedir
        ;;
 
     --libs)
-       echo -L$libdir -lXCurses @LDFLAGS@ @MH_EXTRA_LIBS@
-       ;;
-
-    --libs-static)
-       echo $libdir/libXCurses.a @LDFLAGS@ @MH_XLIBS@ @MH_EXTRA_LIBS@
+       echo -L$prefix/lib -lXCurses @LDFLAGS@ @MH_XLIBS@ @MH_EXTRA_LIBS@
        ;;
 
     *)

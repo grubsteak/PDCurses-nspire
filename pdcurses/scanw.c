@@ -1,43 +1,35 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-scanw
------
+  Name:                                                         scanw
 
-### Synopsis
+  Synopsis:
+        int scanw(const char *fmt, ...);
+        int wscanw(WINDOW *win, const char *fmt, ...);
+        int mvscanw(int y, int x, const char *fmt, ...);
+        int mvwscanw(WINDOW *win, int y, int x, const char *fmt, ...);
+        int vwscanw(WINDOW *win, const char *fmt, va_list varglist);
+        int vw_scanw(WINDOW *win, const char *fmt, va_list varglist);
 
-    int scanw(const char *fmt, ...);
-    int wscanw(WINDOW *win, const char *fmt, ...);
-    int mvscanw(int y, int x, const char *fmt, ...);
-    int mvwscanw(WINDOW *win, int y, int x, const char *fmt, ...);
-    int vwscanw(WINDOW *win, const char *fmt, va_list varglist);
-    int vw_scanw(WINDOW *win, const char *fmt, va_list varglist);
+  Description:
+        These routines correspond to the standard C library's scanf()
+        family. Each gets a string from the window via wgetnstr(), and
+        uses the resulting line as input for the scan.
 
-### Description
+  Return Value:
+        On successful completion, these functions return the number of
+        items successfully matched.  Otherwise they return ERR.
 
-   These routines correspond to the standard C library's scanf() family.
-   Each gets a string from the window via wgetnstr(), and uses the
-   resulting line as input for the scan.
-
-   The duplication between vwscanw() and vw_scanw() is for historic
-   reasons. In PDCurses, they're the same.
-
-### Return Value
-
-   On successful completion, these functions return the number of items
-   successfully matched. Otherwise they return ERR.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    scanw                       Y       Y       Y
-    wscanw                      Y       Y       Y
-    mvscanw                     Y       Y       Y
-    mvwscanw                    Y       Y       Y
-    vwscanw                     Y       Y       Y
-    vw_scanw                    Y       Y       Y
+  Portability                                X/Open    BSD    SYS V
+        scanw                                   Y       Y       Y
+        wscanw                                  Y       Y       Y
+        mvscanw                                 Y       Y       Y
+        mvwscanw                                Y       Y       Y
+        vwscanw                                 Y       -      4.0
+        vw_scanw                                Y
 
 **man-end****************************************************************/
 
@@ -136,17 +128,17 @@ int vw_scanw(WINDOW *win, const char *fmt, va_list varglist)
 
 #ifndef HAVE_VSSCANF
 
-/* _pdc_vsscanf() - Internal routine to parse and format an input
-   buffer. It scans a series of input fields; each field is formatted
-   according to a supplied format string and the formatted input is
-   stored in the variable number of addresses passed. Returns the number
+/* _pdc_vsscanf() - Internal routine to parse and format an input 
+   buffer. It scans a series of input fields; each field is formatted 
+   according to a supplied format string and the formatted input is 
+   stored in the variable number of addresses passed. Returns the number 
    of input fields or EOF on error.
 
-   Don't compile this unless required. Some compilers (at least Borland
+   Don't compile this unless required. Some compilers (at least Borland 
    C++ 3.0) have to link with math libraries due to the use of floats.
 
-   Based on vsscanf.c and input.c from emx 0.8f library source,
-   Copyright (c) 1990-1992 by Eberhard Mattes, who has kindly agreed to
+   Based on vsscanf.c and input.c from emx 0.8f library source, 
+   Copyright (c) 1990-1992 by Eberhard Mattes, who has kindly agreed to 
    its inclusion in PDCurses. */
 
 #define WHITE(x) ((x) == ' ' || (x) == '\t' || (x) == '\n')
@@ -215,13 +207,13 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
             ++fmt;
         } else
         {
-            assign = TRUE;
+            assign = PDC_TRUE;
             width = INT_MAX;
             char_ptr = NULL;
             ++fmt;
             if (*fmt == '*')
             {
-                assign = FALSE;
+                assign = PDC_FALSE;
                 ++fmt;
             }
             if (isdigit(*fmt))
@@ -336,7 +328,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
             case 'E':
             case 'g':
             case 'G':
-                neg = ok = FALSE;
+                neg = ok = PDC_FALSE;
                 dx = 0.0;
                 do
                 {
@@ -349,7 +341,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                     --width;
                 } else if (c == '-')
                 {
-                    neg = TRUE;
+                    neg = PDC_TRUE;
                     NEXT(c);
                     --width;
                 }
@@ -357,7 +349,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                 {
                     --width;
                     dx = dx * 10.0 + (double) (c - '0');
-                    ok = TRUE;
+                    ok = PDC_TRUE;
                     c = *buf++;
                     if (!c)
                         break;
@@ -374,7 +366,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                         --width;
                         dx += (double) (c - '0') / dd;
                         dd *= 10.0;
-                        ok = TRUE;
+                        ok = PDC_TRUE;
                         c = *buf++;
                         if (!c)
                             break;
@@ -386,7 +378,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                     return count;
                 if (width > 0 && (c == 'e' || c == 'E'))
                 {
-                    eneg = FALSE;
+                    eneg = PDC_FALSE;
                     exp = 0;
                     NEXT(c);
                     --width;
@@ -396,7 +388,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                         --width;
                     } else if (width > 0 && c == '-')
                     {
-                        eneg = TRUE;
+                        eneg = PDC_TRUE;
                         NEXT(c);
                         --width;
                     }
@@ -450,7 +442,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                     UNGETC();
                 break;
             case 'i':
-                neg = FALSE;
+                neg = PDC_FALSE;
                 radix = 10;
                 do
                 {
@@ -494,7 +486,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                     break;
                 }
             scan_complete_number:
-                neg = FALSE;
+                neg = PDC_FALSE;
                 if (width > 0 && c == '+')
                 {
                     NEXT(c);
@@ -502,13 +494,13 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                 }
                 else if (width > 0 && c == '-' && radix == 10)
                 {
-                    neg = TRUE;
+                    neg = PDC_TRUE;
                     NEXT(c);
                     --width;
                 }
             scan_unsigned_number:
                 n = 0;
-                ok = FALSE;
+                ok = PDC_FALSE;
                 while (width > 0)
                 {
                     --width;
@@ -522,7 +514,7 @@ static int _pdc_vsscanf(const char *buf, const char *fmt, va_list arg_ptr)
                         break;
                     if (d < 0 || d >= radix)
                         break;
-                    ok = TRUE;
+                    ok = PDC_TRUE;
                     n = n * radix + d;
                     c = *buf++;
                     if (!c)

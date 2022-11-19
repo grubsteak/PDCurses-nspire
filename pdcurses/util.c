@@ -1,82 +1,84 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-util
-----
+  Name:                                                         util
 
-### Synopsis
+  Synopsis:
+        char *unctrl(chtype c);
+        void filter(void);
+        void use_env(PDC_bool x);
+        int delay_output(int ms);
 
-    char *unctrl(chtype c);
-    void filter(void);
-    void use_env(bool x);
-    int delay_output(int ms);
+        int getcchar(const cchar_t *wcval, wchar_t *wch, attr_t *attrs,
+                     short *color_pair, void *opts);
+        int setcchar(cchar_t *wcval, const wchar_t *wch, const attr_t attrs,
+                     short color_pair, const void *opts);
+        wchar_t *wunctrl(cchar_t *wc);
 
-    int getcchar(const cchar_t *wcval, wchar_t *wch, attr_t *attrs,
-                 short *color_pair, void *opts);
-    int setcchar(cchar_t *wcval, const wchar_t *wch, const attr_t attrs,
-                 short color_pair, const void *opts);
-    wchar_t *wunctrl(cchar_t *wc);
+        int PDC_mbtowc(wchar_t *pwc, const char *s, size_t n);
+        size_t PDC_mbstowcs(wchar_t *dest, const char *src, size_t n);
+        size_t PDC_wcstombs(char *dest, const wchar_t *src, size_t n);
 
-    int PDC_mbtowc(wchar_t *pwc, const char *s, size_t n);
-    size_t PDC_mbstowcs(wchar_t *dest, const char *src, size_t n);
-    size_t PDC_wcstombs(char *dest, const wchar_t *src, size_t n);
+  Description:
+        unctrl() expands the text portion of the chtype c into a 
+        printable string. Control characters are changed to the "^X" 
+        notation; others are passed through. wunctrl() is the wide- 
+        character version of the function.
 
-### Description
+        filter() and use_env() are no-ops in PDCurses.
 
-   unctrl() expands the text portion of the chtype c into a printable
-   string. Control characters are changed to the "^X" notation; others
-   are passed through. wunctrl() is the wide-character version of the
-   function.
+        delay_output() inserts an ms millisecond pause in output.
 
-   filter() and use_env() are no-ops in PDCurses.
+        getcchar() works in two modes: When wch is not NULL, it reads 
+        the cchar_t pointed to by wcval and stores the attributes in 
+        attrs, the color pair in color_pair, and the text in the
+        wide-character string wch. When wch is NULL, getcchar() merely 
+        returns the number of wide characters in wcval. In either mode, 
+        the opts argument is unused.
 
-   delay_output() inserts an ms millisecond pause in output.
+        setcchar constructs a cchar_t at wcval from the wide-character 
+        text at wch, the attributes in attr and the color pair in 
+        color_pair. The opts argument is unused.
 
-   getcchar() works in two modes: When wch is not NULL, it reads the
-   cchar_t pointed to by wcval and stores the attributes in attrs, the
-   color pair in color_pair, and the text in the wide-character string
-   wch. When wch is NULL, getcchar() merely returns the number of wide
-   characters in wcval. In either mode, the opts argument is unused.
+        Currently, the length returned by getcchar() is always 1 or 0.
+        Similarly, setcchar() will only take the first wide character
+        from wch, and ignore any others that it "should" take (i.e.,
+        combining characters). Nor will it correctly handle any 
+        character outside the basic multilingual plane (UCS-2).
 
-   setcchar constructs a cchar_t at wcval from the wide-character text
-   at wch, the attributes in attr and the color pair in color_pair. The
-   opts argument is unused.
+  Return Value:
+        unctrl() and wunctrl() return NULL on failure. delay_output() 
+        always returns OK.
 
-   Currently, the length returned by getcchar() is always 1 or 0.
-   Similarly, setcchar() will only take the first wide character from
-   wch, and ignore any others that it "should" take (i.e., combining
-   characters). Nor will it correctly handle any character outside the
-   basic multilingual plane (UCS-2).
+        getcchar() returns the number of wide characters wcval points to 
+        when wch is NULL; when it's not, getcchar() returns OK or ERR. 
 
-### Return Value
+        setcchar() returns OK or ERR.
 
-   wunctrl() returns NULL on failure. delay_output() always returns OK.
-
-   getcchar() returns the number of wide characters wcval points to when
-   wch is NULL; when it's not, getcchar() returns OK or ERR.
-
-   setcchar() returns OK or ERR.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    unctrl                      Y       Y       Y
-    filter                      Y       Y       Y
-    use_env                     Y       Y       Y
-    delay_output                Y       Y       Y
-    getcchar                    Y       Y       Y
-    setcchar                    Y       Y       Y
-    wunctrl                     Y       Y       Y
-    PDC_mbtowc                  -       -       -
-    PDC_mbstowcs                -       -       -
-    PDC_wcstombs                -       -       -
+  Portability                                X/Open    BSD    SYS V
+        unctrl                                  Y       Y       Y
+        filter                                  Y       -      3.0
+        use_env                                 Y       -      4.0
+        delay_output                            Y       Y       Y
+        getcchar                                Y
+        setcchar                                Y
+        wunctrl                                 Y
+        PDC_mbtowc                              -       -       -
+        PDC_mbstowcs                            -       -       -
+        PDC_wcstombs                            -       -       -
 
 **man-end****************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#ifdef PDC_WIDE
+# ifdef PDC_FORCE_UTF8
+#  include <string.h>
+# else
+#  include <stdlib.h>
+# endif
+#endif
 
 char *unctrl(chtype c)
 {
@@ -110,7 +112,7 @@ void filter(void)
     PDC_LOG(("filter() - called\n"));
 }
 
-void use_env(bool x)
+void use_env(PDC_bool x)
 {
     PDC_LOG(("use_env() - called: x %d\n", x));
 }
@@ -165,9 +167,6 @@ wchar_t *wunctrl(cchar_t *wc)
     cchar_t ic;
 
     PDC_LOG(("wunctrl() - called\n"));
-
-    if (!wc)
-        return NULL;
 
     ic = *wc & A_CHARTEXT;
 

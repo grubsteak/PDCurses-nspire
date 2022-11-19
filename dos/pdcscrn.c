@@ -1,18 +1,28 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include "pdcdos.h"
 
 #include <stdlib.h>
 
+#ifdef CHTYPE_LONG
+# define PDC_OFFSET 32
+#else
+# define PDC_OFFSET  8
+#endif
+
+/* COLOR_PAIR to attribute encoding table. */
+
+unsigned char *pdc_atrtab = (unsigned char *)NULL;
+
 int pdc_adapter;         /* screen type */
 int pdc_scrnmode;        /* default screen mode */
 int pdc_font;            /* default font size */
-bool pdc_direct_video;   /* allow direct screen memory writes */
-bool pdc_bogus_adapter;  /* TRUE if adapter has insane values */
+PDC_bool pdc_direct_video;   /* allow direct screen memory writes */
+PDC_bool pdc_bogus_adapter;  /* PDC_TRUE if adapter has insane values */
 unsigned pdc_video_seg;  /* video base segment */
 unsigned pdc_video_ofs;  /* video base offset */
 
-static short realtocurs[16] =
+static short curstoreal[16], realtocurs[16] =
 {
     COLOR_BLACK, COLOR_BLUE, COLOR_GREEN, COLOR_CYAN, COLOR_RED,
     COLOR_MAGENTA, COLOR_YELLOW, COLOR_WHITE, COLOR_BLACK + 8,
@@ -20,9 +30,7 @@ static short realtocurs[16] =
     COLOR_MAGENTA + 8, COLOR_YELLOW + 8, COLOR_WHITE + 8
 };
 
-short pdc_curstoreal[16];
-
-static bool sizeable = FALSE;   /* TRUE if adapter is resizeable    */
+static PDC_bool sizeable = PDC_FALSE;   /* PDC_TRUE if adapter is resizeable    */
 
 static unsigned short *saved_screen = NULL;
 static int saved_lines = 0;
@@ -74,10 +82,10 @@ static int _get_font(void)
     return retval;
 }
 
-/* _set_font() - Sets the current font size, if the adapter allows such a
-   change. It is an error to attempt to change the font size on a
-   "bogus" adapter. The reason for this is that we have a known video
-   adapter identity problem. e.g. Two adapters report the same identifying
+/* _set_font() - Sets the current font size, if the adapter allows such a 
+   change. It is an error to attempt to change the font size on a 
+   "bogus" adapter. The reason for this is that we have a known video 
+   adapter identity problem. e.g. Two adapters report the same identifying 
    characteristics. */
 
 static void _set_font(int size)
@@ -144,7 +152,7 @@ static void _set_font(int size)
     pdc_font = _get_font();
 }
 
-/* _set_80x25() - force a known screen state: 80x25 text mode. Forces the
+/* _set_80x25() - force a known screen state: 80x25 text mode. Forces the 
    appropriate 80x25 alpha mode given the display adapter. */
 
 static void _set_80x25(void)
@@ -183,7 +191,7 @@ static int _get_scrn_mode(void)
     return (int)regs.h.al;
 }
 
-/* _set_scrn_mode() - Sets the BIOS Video Mode Number only if it is
+/* _set_scrn_mode() - Sets the BIOS Video Mode Number only if it is 
    different from the current video mode. */
 
 static void _set_scrn_mode(int new_mode)
@@ -203,7 +211,7 @@ static void _set_scrn_mode(int new_mode)
     COLS = PDC_get_columns();
 }
 
-/* _sanity_check() - A video adapter identification sanity check. This
+/* _sanity_check() - A video adapter identification sanity check. This 
    routine will force sane values for various control flags. */
 
 static int _sanity_check(int adapter)
@@ -220,10 +228,10 @@ static int _sanity_check(int adapter)
         switch (rows)
         {
         case 25:
-        case 43:
+        case 43:    
             break;
         default:
-            pdc_bogus_adapter = TRUE;
+            pdc_bogus_adapter = PDC_TRUE;
         }
 
         switch (fontsize)
@@ -232,7 +240,7 @@ static int _sanity_check(int adapter)
         case _FONT14:
             break;
         default:
-            pdc_bogus_adapter = TRUE;
+            pdc_bogus_adapter = PDC_TRUE;
         }
         break;
 
@@ -249,18 +257,18 @@ static int _sanity_check(int adapter)
         case 25:
             break;
         default:
-            pdc_bogus_adapter = TRUE;
+            pdc_bogus_adapter = PDC_TRUE;
         }
         break;
 
     default:
-        pdc_bogus_adapter = TRUE;
+        pdc_bogus_adapter = PDC_TRUE;
     }
 
     if (pdc_bogus_adapter)
     {
-        sizeable = FALSE;
-        pdc_direct_video = FALSE;
+        sizeable = PDC_FALSE;
+        pdc_direct_video = PDC_FALSE;
     }
 
     return adapter;
@@ -304,7 +312,7 @@ static int _query_adapter_type(void)
             break;
         case 4:
             retval = _EGACOLOR;
-            sizeable = TRUE;
+            sizeable = PDC_TRUE;
             break;
         case 5:
             retval = _EGAMONO;
@@ -312,7 +320,7 @@ static int _query_adapter_type(void)
         case 26:            /* ...alt. VGA BIOS... */
         case 7:
             retval = _VGACOLOR;
-            sizeable = TRUE;
+            sizeable = PDC_TRUE;
             break;
         case 8:
             retval = _VGAMONO;
@@ -404,12 +412,12 @@ static int _query_adapter_type(void)
     ||  (retval == _CGA)
 #endif
     )
-        pdc_direct_video = FALSE;
+        pdc_direct_video = PDC_FALSE;
 
     if ((unsigned)pdc_video_seg == 0xb000)
-        SP->mono = TRUE;
+        SP->mono = PDC_TRUE;
     else
-        SP->mono = FALSE;
+        SP->mono = PDC_FALSE;
 
     /* Check for DESQview shadow buffer
        thanks to paganini@ax.apc.org for the GO32 fix */
@@ -435,13 +443,15 @@ static int _query_adapter_type(void)
     return _sanity_check(retval);
 }
 
-/* close the physical screen -- may restore the screen to its state
+/* close the physical screen -- may restore the screen to its state 
    before PDC_scr_open(); miscellaneous cleanup */
 
 void PDC_scr_close(void)
 {
 #if SMALL || MEDIUM
+# ifndef __PACIFIC__
     struct SREGS segregs;
+# endif
     int ds;
 #endif
     PDC_LOG(("PDC_scr_close() - called\n"));
@@ -454,8 +464,12 @@ void PDC_scr_close(void)
             pdc_video_ofs));
 #else
 # if (SMALL || MEDIUM)
+#  ifdef __PACIFIC__
+        ds = FP_SEG((void far *)saved_screen);
+#  else
         segread(&segregs);
         ds = segregs.ds;
+#  endif
         movedata(ds, (int)saved_screen, pdc_video_seg, pdc_video_ofs,
         (saved_lines * saved_cols * 2));
 # else
@@ -479,27 +493,41 @@ void PDC_scr_close(void)
 
 void PDC_scr_free(void)
 {
+    if (SP)
+        free(SP);
+    if (pdc_atrtab)
+        free(pdc_atrtab);
+
+    pdc_atrtab = (unsigned char *)NULL;
 }
 
-/* open the physical screen -- miscellaneous initialization, may save
-   the existing screen for later restoration */
+/* open the physical screen -- allocate SP, miscellaneous intialization, 
+   and may save the existing screen for later restoration */
 
-int PDC_scr_open(void)
+int PDC_scr_open(int argc, char **argv)
 {
 #if SMALL || MEDIUM
+# ifndef __PACIFIC__
     struct SREGS segregs;
+# endif
     int ds;
 #endif
     int i;
 
     PDC_LOG(("PDC_scr_open() - called\n"));
 
+    SP = calloc(1, sizeof(SCREEN));
+    pdc_atrtab = calloc(PDC_COLOR_PAIRS * PDC_OFFSET, 1);
+
+    if (!SP || !pdc_atrtab)
+        return ERR;
+
     for (i = 0; i < 16; i++)
-        pdc_curstoreal[realtocurs[i]] = i;
+        curstoreal[realtocurs[i]] = i;
 
-    SP->orig_attr = FALSE;
+    SP->orig_attr = PDC_FALSE;
 
-    pdc_direct_video = TRUE; /* Assume that we can */
+    pdc_direct_video = PDC_TRUE; /* Assume that we can */
     pdc_video_seg = 0xb000;  /* Base screen segment addr */
     pdc_video_ofs = 0x0;     /* Base screen segment ofs */
 
@@ -507,29 +535,30 @@ int PDC_scr_open(void)
     pdc_scrnmode = _get_scrn_mode();
     pdc_font = _get_font();
 
+    SP->lines = PDC_get_rows();
+    SP->cols = PDC_get_columns();
+
     SP->mouse_wait = PDC_CLICK_PERIOD;
-    SP->audible = TRUE;
+    SP->audible = PDC_TRUE;
 
-    SP->termattrs = (SP->mono ? A_UNDERLINE : A_COLOR) | A_REVERSE | A_BLINK;
-
-    /* If the environment variable PDCURSES_BIOS is set, the DOS int10()
+    /* If the environment variable PDCURSES_BIOS is set, the DOS int10() 
        BIOS calls are used in place of direct video memory access. */
 
     if (getenv("PDCURSES_BIOS"))
-        pdc_direct_video = FALSE;
+        pdc_direct_video = PDC_FALSE;
 
     /* This code for preserving the current screen. */
 
     if (getenv("PDC_RESTORE_SCREEN"))
     {
-        saved_lines = PDC_get_rows();
-        saved_cols = PDC_get_columns();
+        saved_lines = SP->lines;
+        saved_cols = SP->cols;
 
         saved_screen = malloc(saved_lines * saved_cols * 2);
 
         if (!saved_screen)
         {
-            SP->_preserve = FALSE;
+            SP->_preserve = PDC_FALSE;
             return OK;
         }
 #ifdef __DJGPP__
@@ -537,8 +566,12 @@ int PDC_scr_open(void)
                   saved_lines * saved_cols * 2, saved_screen);
 #else
 # if SMALL || MEDIUM
+#  ifdef __PACIFIC__
+        ds = FP_SEG((void far *) saved_screen);
+#  else
         segread(&segregs);
         ds = segregs.ds;
+#  endif
         movedata(pdc_video_seg, pdc_video_ofs, ds, (int)saved_screen,
                  (saved_lines * saved_cols * 2));
 # else
@@ -561,7 +594,7 @@ int PDC_resize_screen(int nlines, int ncols)
     PDC_LOG(("PDC_resize_screen() - called. Lines: %d Cols: %d\n",
              nlines, ncols));
 
-    /* Trash the stored value of orig_cursor -- it's only good if the
+    /* Trash the stored value of orig_cursor -- it's only good if the 
        video mode doesn't change */
 
     SP->orig_cursor = 0x0607;
@@ -621,6 +654,44 @@ void PDC_save_screen_mode(int i)
     }
 }
 
+void PDC_init_pair(short pair, short fg, short bg)
+{
+    unsigned char att, temp_bg;
+    chtype i;
+
+    fg = curstoreal[fg];
+    bg = curstoreal[bg];
+
+    for (i = 0; i < PDC_OFFSET; i++)
+    {
+        att = fg | (bg << 4);
+
+        if (i & (A_REVERSE >> PDC_ATTR_SHIFT))
+            att = bg | (fg << 4);
+        if (i & (A_UNDERLINE >> PDC_ATTR_SHIFT))
+            att = 1;
+        if (i & (A_INVIS >> PDC_ATTR_SHIFT))
+        {
+            temp_bg = att >> 4;
+            att = temp_bg << 4 | temp_bg;
+        }
+        if (i & (A_BOLD >> PDC_ATTR_SHIFT))
+            att |= 8;
+        if (i & (A_BLINK >> PDC_ATTR_SHIFT))
+            att |= 128;
+
+        pdc_atrtab[pair * PDC_OFFSET + i] = att;
+    }
+}
+
+int PDC_pair_content(short pair, short *fg, short *bg)
+{
+    *fg = realtocurs[pdc_atrtab[pair * PDC_OFFSET] & 0x0F];
+    *bg = realtocurs[(pdc_atrtab[pair * PDC_OFFSET] & 0xF0) >> 4];
+
+    return OK;
+}
+
 /* _egapal() - Find the EGA palette value (0-63) for the color (0-15).
    On VGA, this is an index into the DAC. */
 
@@ -629,14 +700,14 @@ static short _egapal(short color)
     PDCREGS regs;
 
     regs.W.ax = 0x1007;
-    regs.h.bl = pdc_curstoreal[color];
+    regs.h.bl = curstoreal[color];
 
     PDCINT(0x10, regs);
 
     return regs.h.bh;
 }
 
-bool PDC_can_change_color(void)
+PDC_bool PDC_can_change_color(void)
 {
     return (pdc_adapter == _VGACOLOR);
 }

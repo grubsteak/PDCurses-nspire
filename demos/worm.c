@@ -154,8 +154,7 @@ int main(int argc, char *argv[])
     const struct options *op;
     struct worm *w;
     short **ref, *ip;
-    time_t seed;
-    int x, y, n, h, last, bottom;
+    int x, y, n, h, last, bottom, seed;
 
     for (x = 1; x < argc; x++)
     {
@@ -213,7 +212,7 @@ int main(int argc, char *argv[])
     noecho();
     cbreak();
     nonl();
-    keypad(stdscr, TRUE);
+    keypad(stdscr, PDC_TRUE);
 
     curs_set(0);
 
@@ -223,7 +222,7 @@ int main(int argc, char *argv[])
 #ifdef A_COLOR
     if (has_colors())
     {
-        short bg = COLOR_BLACK;
+        int bg = COLOR_BLACK;
         start_color();
 
 # if defined(NCURSES_VERSION) || (defined(PDC_BUILD) && PDC_BUILD > 3000)
@@ -304,7 +303,7 @@ int main(int argc, char *argv[])
 
     napms(12);
     refresh();
-    nodelay(stdscr, TRUE);
+    nodelay(stdscr, PDC_TRUE);
 
     for (;;)
     {
@@ -317,6 +316,7 @@ int main(int argc, char *argv[])
             {
 # ifdef PDCURSES
                 resize_term(0, 0);
+                erase();
 # endif
                 if (last != COLS - 1)
                 {
@@ -361,9 +361,9 @@ int main(int argc, char *argv[])
                 return EXIT_SUCCESS;
             }
             else if (ch == 's')
-                nodelay(stdscr, FALSE);
+                nodelay(stdscr, PDC_FALSE);
             else if (ch == ' ')
-                nodelay(stdscr, TRUE);
+                nodelay(stdscr, PDC_TRUE);
         }
 
         for (n = 0, w = &worm[0]; n < number; n++, w++)

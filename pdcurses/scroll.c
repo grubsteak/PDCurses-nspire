@@ -1,40 +1,35 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-scroll
-------
+  Name:                                                         scroll
 
-### Synopsis
+  Synopsis:
+        int scroll(WINDOW *win);
+        int scrl(int n);
+        int wscrl(WINDOW *win, int n);
 
-    int scroll(WINDOW *win);
-    int scrl(int n);
-    int wscrl(WINDOW *win, int n);
+  Description:
+        scroll() causes the window to scroll up one line.  This involves 
+        moving the lines in the window data strcture.
+ 
+        With a positive n, scrl() and wscrl() scroll the window up n 
+        lines (line i + n becomes i); otherwise they scroll the window 
+        down n lines.
+ 
+        For these functions to work, scrolling must be enabled via 
+        scrollok(). Note also that scrolling is not allowed if the 
+        supplied window is a pad.
 
-### Description
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   scroll() causes the window to scroll up one line. This involves
-   moving the lines in the window data strcture.
-
-   With a positive n, scrl() and wscrl() scroll the window up n lines
-   (line i + n becomes i); otherwise they scroll the window down n
-   lines.
-
-   For these functions to work, scrolling must be enabled via
-   scrollok(). Note also that scrolling is not allowed if the supplied
-   window is a pad.
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    scroll                      Y       Y       Y
-    scrl                        Y       Y       Y
-    wscrl                       Y       Y       Y
+  Portability                                X/Open    BSD    SYS V
+        scroll                                  Y       Y       Y
+        scrl                                    Y       -      4.0
+        wscrl                                   Y       -      4.0
 
 **man-end****************************************************************/
 
@@ -63,7 +58,7 @@ int wscrl(WINDOW *win, int n)
         dir = -1;
     }
 
-    for (l = 0; l < (n * dir); l++)
+    for (l = 0; l < (n * dir); l++) 
     {
         temp = win->_y[start];
 

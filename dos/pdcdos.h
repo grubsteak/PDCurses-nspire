@@ -1,7 +1,25 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 #include <string.h>
+
+#ifdef CHTYPE_LONG
+# define PDC_ATTR_SHIFT 19
+#else
+# define PDC_ATTR_SHIFT 8
+#endif
+
+#if defined(_MSC_VER) || defined(_QC)
+# define MSC 1
+#endif
+
+#if defined(__PACIFIC__) && !defined(__SMALL__)
+# define __SMALL__
+#endif
+
+#if defined(__HIGHC__) || MSC
+# include <bios.h>
+#endif
 
 /*----------------------------------------------------------------------
  *  MEMORY MODEL SUPPORT:
@@ -36,12 +54,12 @@
 
 #include <dos.h>
 
-extern short pdc_curstoreal[16];
+extern unsigned char *pdc_atrtab;
 extern int pdc_adapter;
 extern int pdc_scrnmode;
 extern int pdc_font;
-extern bool pdc_direct_video;
-extern bool pdc_bogus_adapter;
+extern PDC_bool pdc_direct_video;
+extern PDC_bool pdc_bogus_adapter;
 extern unsigned pdc_video_seg;
 extern unsigned pdc_video_ofs;
 
@@ -74,7 +92,7 @@ unsigned long getdosmemdword(int offs);
 void setdosmembyte(int offs, unsigned char b);
 void setdosmemword(int offs, unsigned short w);
 #else
-# if SMALL || MEDIUM
+# if SMALL || MEDIUM || MSC
 #  define PDC_FAR far
 # else
 #  define PDC_FAR
@@ -103,7 +121,7 @@ typedef union
     struct
     {
         unsigned short di, di_hi, si, si_hi, bp, bp_hi, res, res_hi,
-                       bx, bx_hi, dx, dx_hi, cx, cx_hi, ax, ax_hi,
+                       bx, bx_hi, dx, dx_hi, cx, cx_hi, ax, ax_hi, 
                        flags, es, ds, fs, gs, ip, cs, sp, ss;
     } w;
 
@@ -166,3 +184,7 @@ enum
     _FONT15,    /* GENIUS */
     _FONT16
 };
+
+#ifdef __PACIFIC__
+void movedata(unsigned, unsigned, unsigned, unsigned, unsigned);
+#endif

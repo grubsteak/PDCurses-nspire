@@ -1,37 +1,32 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-delch
------
+  Name:                                                         delch
 
-### Synopsis
+  Synopsis:
+        int delch(void);
+        int wdelch(WINDOW *win);
+        int mvdelch(int y, int x);
+        int mvwdelch(WINDOW *win, int y, int x);
 
-    int delch(void);
-    int wdelch(WINDOW *win);
-    int mvdelch(int y, int x);
-    int mvwdelch(WINDOW *win, int y, int x);
+  Description:
+        The character under the cursor in the window is deleted.  All
+        characters to the right on the same line are moved to the left
+        one position and the last character on the line is filled with
+        a blank.  The cursor position does not change (after moving to
+        y, x if coordinates are specified).
 
-### Description
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   The character under the cursor in the window is deleted. All
-   characters to the right on the same line are moved to the left one
-   position and the last character on the line is filled with a blank.
-   The cursor position does not change (after moving to y, x if
-   coordinates are specified).
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    delch                       Y       Y       Y
-    wdelch                      Y       Y       Y
-    mvdelch                     Y       Y       Y
-    mvwdelch                    Y       Y       Y
+  Portability                                X/Open    BSD    SYS V
+        delch                                   Y       Y       Y
+        wdelch                                  Y       Y       Y
+        mvdelch                                 Y       Y       Y
+        mvwdelch                                Y       Y       Y
 
 **man-end****************************************************************/
 

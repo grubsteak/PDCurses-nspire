@@ -1,6 +1,6 @@
 /*
  * Author : P.J. Kunst <kunst@prl.philips.nl>
- * Date   : 1993-02-25
+ * Date   : 25-02-93
  *
  * Purpose: This program demonstrates the use of the 'curses' library
  *          for the creation of (simple) menu-operated programs.
@@ -19,17 +19,17 @@
 
 /* change this if source at other location */
 
-#ifdef PDC_FORCE_UTF8
-# define FNAME "../demos/UTF-8-demo.txt"
+#ifdef XCURSES
+# define FNAME  "../demos/tui.c"
 #else
-# define FNAME "../demos/tui.c"
+# define FNAME  "..\\demos\\tui.c"
 #endif
 
 /**************************** strings entry box ***************************/
 
 void address(void)
 {
-    char *fieldname[6] =
+    char *fieldname[6] = 
     {
         "Name", "Street", "City", "State", "Country", (char *)0
     };
@@ -75,7 +75,7 @@ void showfile(char *fname)
     int i, bh = bodylen();
     FILE *fp;
     char buf[MAXSTRLEN];
-    bool ateof = FALSE;
+    PDC_bool ateof = PDC_FALSE;
 
     statusmsg("FileBrowser: Hit key to continue, Q to quit");
 
@@ -87,10 +87,13 @@ void showfile(char *fname)
 
             for (i = 0; i < bh - 1 && !ateof; i++)
             {
-                if (fgets(buf, MAXSTRLEN, fp))
+                buf[0] = '\0';
+                fgets(buf, MAXSTRLEN, fp);
+
+                if (strlen(buf))
                     bodymsg(buf);
                 else
-                    ateof = TRUE;
+                    ateof = PDC_TRUE;
             }
 
             switch (waitforkey())
@@ -98,7 +101,7 @@ void showfile(char *fname)
             case 'Q':
             case 'q':
             case 0x1b:
-                ateof = TRUE;
+                ateof = PDC_TRUE;
             }
         }
 

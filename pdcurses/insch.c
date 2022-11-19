@@ -1,62 +1,58 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-insch
------
+  Name:                                                         insch
 
-### Synopsis
+  Synopsis:
+        int insch(chtype ch);
+        int winsch(WINDOW *win, chtype ch);
+        int mvinsch(int y, int x, chtype ch);
+        int mvwinsch(WINDOW *win, int y, int x, chtype ch);
 
-    int insch(chtype ch);
-    int winsch(WINDOW *win, chtype ch);
-    int mvinsch(int y, int x, chtype ch);
-    int mvwinsch(WINDOW *win, int y, int x, chtype ch);
+        int insrawch(chtype ch);
+        int winsrawch(WINDOW *win, chtype ch);
+        int mvinsrawch(int y, int x, chtype ch);
+        int mvwinsrawch(WINDOW *win, int y, int x, chtype ch);
 
-    int insrawch(chtype ch);
-    int winsrawch(WINDOW *win, chtype ch);
-    int mvinsrawch(int y, int x, chtype ch);
-    int mvwinsrawch(WINDOW *win, int y, int x, chtype ch);
+        int ins_wch(const cchar_t *wch);
+        int wins_wch(WINDOW *win, const cchar_t *wch);
+        int mvins_wch(int y, int x, const cchar_t *wch);
+        int mvwins_wch(WINDOW *win, int y, int x, const cchar_t *wch);
 
-    int ins_wch(const cchar_t *wch);
-    int wins_wch(WINDOW *win, const cchar_t *wch);
-    int mvins_wch(int y, int x, const cchar_t *wch);
-    int mvwins_wch(WINDOW *win, int y, int x, const cchar_t *wch);
+  Description:
+        The insch() functions insert a chtype into the window at the 
+        current or specified cursor position. The cursor is NOT 
+        advanced. A newline is equivalent to clrtoeol(); tabs are 
+        expanded; other control characters are converted as with 
+        unctrl().
 
-### Description
+        The ins_wch() functions are the wide-character
+        equivalents, taking cchar_t pointers rather than chtypes.
 
-   The insch() functions insert a chtype into the window at the current
-   or specified cursor position. The cursor is NOT advanced. A newline
-   is equivalent to clrtoeol(); tabs are expanded; other control
-   characters are converted as with unctrl().
+        Video attributes can be combined with a character by ORing
+        them into the parameter. Text, including attributes, can be 
+        copied from one place to another using inch() and insch().
 
-   The ins_wch() functions are the wide-character equivalents, taking
-   cchar_t pointers rather than chtypes.
+        insrawch() etc. are PDCurses-specific wrappers for insch() etc. 
+        that disable the translation of control characters.
 
-   Video attributes can be combined with a character by ORing them into
-   the parameter. Text, including attributes, can be copied from one
-   place to another using inch() and insch().
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   insrawch() etc. are PDCurses-specific wrappers for insch() etc. that
-   disable the translation of control characters.
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    insch                       Y       Y       Y
-    winsch                      Y       Y       Y
-    mvinsch                     Y       Y       Y
-    mvwinsch                    Y       Y       Y
-    ins_wch                     Y       Y       Y
-    wins_wch                    Y       Y       Y
-    mvins_wch                   Y       Y       Y
-    mvwins_wch                  Y       Y       Y
-    insrawch                    -       -       -
-    winsrawch                   -       -       -
+  Portability                                X/Open    BSD    SYS V
+        insch                                   Y       Y       Y
+        winsch                                  Y       Y       Y
+        mvinsch                                 Y       Y       Y
+        mvwinsch                                Y       Y       Y
+        insrawch                                -       -       -
+        winsrawch                               -       -       -
+        ins_wch                                 Y
+        wins_wch                                Y
+        mvins_wch                               Y
+        mvwins_wch                              Y
 
 **man-end****************************************************************/
 
@@ -66,7 +62,7 @@ int winsch(WINDOW *win, chtype ch)
 {
     int x, y;
     chtype attr;
-    bool xlat;
+    PDC_bool xlat;
 
     PDC_LOG(("winsch() - called: win=%p ch=%x (text=%c attr=0x%x)\n",
              win, ch, ch & A_CHARTEXT, ch & A_ATTRIBUTES));

@@ -3,7 +3,7 @@
  * 'textual user interface'
  *
  * Author : P.J. Kunst <kunst@prl.philips.nl>
- * Date   : 1993-02-25
+ * Date   : 25-02-93
  */
 
 #include <ctype.h>
@@ -57,13 +57,13 @@ void rmerror(void);
 static WINDOW *wtitl, *wmain, *wbody, *wstat; /* title, menu, body, status win*/
 static int nexty, nextx;
 static int key = ERR, ch = ERR;
-static bool quit = FALSE;
-static bool incurses = FALSE;
+static PDC_bool quit = PDC_FALSE;
+static PDC_bool incurses = PDC_FALSE;
 
 #ifndef PDCURSES
 static char wordchar(void)
 {
-    return 0x17;    /* ^W */
+    return 0x17;    /* ^W */ 
 }
 #endif
 
@@ -108,13 +108,13 @@ static void initcolor(void)
 
     /* foreground, background */
 
-    init_pair(TITLECOLOR       & ~A_ATTR, COLOR_BLACK, COLOR_CYAN);
-    init_pair(MAINMENUCOLOR    & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);
+    init_pair(TITLECOLOR       & ~A_ATTR, COLOR_BLACK, COLOR_CYAN);      
+    init_pair(MAINMENUCOLOR    & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);    
     init_pair(MAINMENUREVCOLOR & ~A_ATTR, COLOR_WHITE, COLOR_BLACK);
-    init_pair(SUBMENUCOLOR     & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);
-    init_pair(SUBMENUREVCOLOR  & ~A_ATTR, COLOR_WHITE, COLOR_BLACK);
-    init_pair(BODYCOLOR        & ~A_ATTR, COLOR_WHITE, COLOR_BLUE);
-    init_pair(STATUSCOLOR      & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);
+    init_pair(SUBMENUCOLOR     & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);    
+    init_pair(SUBMENUREVCOLOR  & ~A_ATTR, COLOR_WHITE, COLOR_BLACK);   
+    init_pair(BODYCOLOR        & ~A_ATTR, COLOR_WHITE, COLOR_BLUE);      
+    init_pair(STATUSCOLOR      & ~A_ATTR, COLOR_WHITE, COLOR_CYAN);   
     init_pair(INPUTBOXCOLOR    & ~A_ATTR, COLOR_BLACK, COLOR_CYAN);
     init_pair(EDITBOXCOLOR     & ~A_ATTR, COLOR_WHITE, COLOR_BLACK);
 #endif
@@ -150,7 +150,7 @@ static void colorbox(WINDOW *win, chtype color, int hasbox)
 #endif
         wbkgd(win, attr);
 
-    werase(win);
+    werase(win); 
 
 #ifdef PDCURSES
     maxy = getmaxy(win);
@@ -174,19 +174,19 @@ static void idle(void)
         return;  /* time not available */
 
     tp = localtime(&t);
-    sprintf(buf, " %.4d-%.2d-%.2d  %.2d:%.2d:%.2d",
-            tp->tm_year + 1900, tp->tm_mon + 1, tp->tm_mday,
+    sprintf(buf, " %.2d-%.2d-%.4d  %.2d:%.2d:%.2d",
+            tp->tm_mday, tp->tm_mon + 1, tp->tm_year + 1900,
             tp->tm_hour, tp->tm_min, tp->tm_sec);
 
     mvwaddstr(wtitl, 0, bw - strlen(buf) - 2, buf);
-    wrefresh(wtitl);
+    wrefresh(wtitl); 
 }
 
 static void menudim(menu *mp, int *lines, int *columns)
 {
     int n, l, mmax = 0;
 
-    for (n = 0; mp->func; n++, mp++)
+    for (n=0; mp->func; n++, mp++)
         if ((l = strlen(mp->name)) > mmax) mmax = l;
 
     *lines = n;
@@ -262,7 +262,7 @@ static void mainmenu(menu *mp)
         {
             if (old != -1)
             {
-                mvwaddstr(wmain, 0, old * barlen,
+                mvwaddstr(wmain, 0, old * barlen, 
                           prepad(padstr(mp[old].name, barlen - 1), 1));
 
                 statusmsg(mp[cur].desc);
@@ -272,7 +272,7 @@ static void mainmenu(menu *mp)
 
             setcolor(wmain, MAINMENUREVCOLOR);
 
-            mvwaddstr(wmain, 0, cur * barlen,
+            mvwaddstr(wmain, 0, cur * barlen, 
                       prepad(padstr(mp[cur].name, barlen - 1), 1));
 
             setcolor(wmain, MAINMENUCOLOR);
@@ -354,7 +354,7 @@ static void cleanup(void)   /* cleanup curses settings */
         delwin(wstat);
         curs_set(1);
         endwin();
-        incurses = FALSE;
+        incurses = PDC_FALSE;
     }
 }
 
@@ -419,7 +419,7 @@ void statusmsg(char *msg)
     wrefresh(wstat);
 }
 
-bool keypressed(void)
+PDC_bool keypressed(void)
 {
     ch = wgetch(wbody);
 
@@ -445,13 +445,13 @@ int waitforkey(void)
 
 void DoExit(void)   /* terminate program */
 {
-    quit = TRUE;
+    quit = PDC_TRUE;
 }
 
 void domenu(menu *mp)
 {
     int y, x, nitems, barlen, mheight, mw, old = -1, cur = 0, cur0;
-    bool stop = FALSE;
+    PDC_bool stop = PDC_FALSE;
     WINDOW *wmenu;
 
     curs_set(0);
@@ -470,7 +470,7 @@ void domenu(menu *mp)
         if (cur != old)
         {
             if (old != -1)
-                mvwaddstr(wmenu, old + 1, 1,
+                mvwaddstr(wmenu, old + 1, 1, 
                           prepad(padstr(mp[old].name, barlen - 1), 1));
 
             setcolor(wmenu, SUBMENUREVCOLOR);
@@ -518,7 +518,7 @@ void domenu(menu *mp)
             if (key == KEY_ESC)
                 key = ERR;  /* return to prev submenu */
 
-            stop = TRUE;
+            stop = PDC_TRUE;
             break;
 
         default:
@@ -545,7 +545,7 @@ void domenu(menu *mp)
 void startmenu(menu *mp, char *mtitle)
 {
     initscr();
-    incurses = TRUE;
+    incurses = PDC_TRUE;
     initcolor();
 
     wtitl = subwin(stdscr, th, bw, 0, 0);
@@ -564,15 +564,15 @@ void startmenu(menu *mp, char *mtitle)
     cbreak();              /* direct input (no newline required)... */
     noecho();              /* ... without echoing */
     curs_set(0);           /* hide cursor (if possible) */
-    nodelay(wbody, TRUE);  /* don't wait for input... */
+    nodelay(wbody, PDC_TRUE);  /* don't wait for input... */
     halfdelay(10);         /* ...well, no more than a second, anyway */
-    keypad(wbody, TRUE);   /* enable cursor keys */
-    scrollok(wbody, TRUE); /* enable scrolling in main window */
+    keypad(wbody, PDC_TRUE);   /* enable cursor keys */
+    scrollok(wbody, PDC_TRUE); /* enable scrolling in main window */
 
-    leaveok(stdscr, TRUE);
-    leaveok(wtitl, TRUE);
-    leaveok(wmain, TRUE);
-    leaveok(wstat, TRUE);
+    leaveok(stdscr, PDC_TRUE);
+    leaveok(wtitl, PDC_TRUE);
+    leaveok(wmain, PDC_TRUE);
+    leaveok(wstat, PDC_TRUE);
 
     mainmenu(mp);
 
@@ -594,7 +594,7 @@ static void repainteditbox(WINDOW *win, int x, char *buf)
     werase(win);
     mvwprintw(win, 0, 0, "%s", padstr(buf, maxx));
     wmove(win, 0, x);
-    wrefresh(win);
+    wrefresh(win); 
 }
 
 /*
@@ -603,15 +603,15 @@ static void repainteditbox(WINDOW *win, int x, char *buf)
 
   Description:
     The initial value of 'str' with a maximum length of 'field' - 1,
-    which is supplied by the calling routine, is editted. The user's
-    erase (^H), kill (^U) and delete word (^W) chars are interpreted.
+    which is supplied by the calling routine, is editted. The user's 
+    erase (^H), kill (^U) and delete word (^W) chars are interpreted. 
     The PC insert or Tab keys toggle between insert and edit mode.
     Escape aborts the edit session, leaving 'str' unchanged.
     Enter, Up or Down Arrow are used to accept the changes to 'str'.
     NOTE: editstr(), mveditstr(), and mvweditstr() are macros.
 
   Return Value:
-    Returns the input terminating character on success (Escape,
+    Returns the input terminating character on success (Escape, 
     Enter, Up or Down Arrow) and ERR on error.
 
   Errors:
@@ -623,9 +623,8 @@ static void repainteditbox(WINDOW *win, int x, char *buf)
 int weditstr(WINDOW *win, char *buf, int field)
 {
     char org[MAXSTRLEN], *tp, *bp = buf;
-    bool defdisp = TRUE, stop = FALSE, insert = FALSE;
-    int cury, curx, begy, begx;
-    chtype oldattr;
+    PDC_bool defdisp = PDC_TRUE, stop = PDC_FALSE, insert = PDC_FALSE;
+    int cury, curx, begy, begx, oldattr;
     WINDOW *wedit;
     int c = 0;
 
@@ -640,10 +639,10 @@ int weditstr(WINDOW *win, char *buf, int field)
     getbegyx(win, begy, begx);
 
     wedit = subwin(win, 1, field, begy + cury, begx + curx);
-    oldattr = getattrs(wedit);
+    oldattr = wedit->_attrs;
     colorbox(wedit, EDITBOXCOLOR, 0);
 
-    keypad(wedit, TRUE);
+    keypad(wedit, PDC_TRUE);
     curs_set(1);
 
     while (!stop)
@@ -658,13 +657,13 @@ int weditstr(WINDOW *win, char *buf, int field)
 
         case KEY_ESC:
             strcpy(buf, org);   /* restore original */
-            stop = TRUE;
+            stop = PDC_TRUE;
             break;
 
         case '\n':
         case KEY_UP:
         case KEY_DOWN:
-            stop = TRUE;
+            stop = PDC_TRUE;
             break;
 
         case KEY_LEFT:
@@ -673,7 +672,7 @@ int weditstr(WINDOW *win, char *buf, int field)
             break;
 
         case KEY_RIGHT:
-            defdisp = FALSE;
+            defdisp = PDC_FALSE;
             if (bp - buf < (int)strlen(buf))
                 bp++;
             break;
@@ -682,18 +681,14 @@ int weditstr(WINDOW *win, char *buf, int field)
                                   is broken on HPUX */
         case KEY_IC:          /* enter insert mode */
         case KEY_EIC:         /* exit insert mode */
-            defdisp = FALSE;
+            defdisp = PDC_FALSE;
             insert = !insert;
 
             curs_set(insert ? 2 : 1);
             break;
 
         default:
-            /* check KEY_BACKSPACE manually, because erasechar() can only
-             * return char, and KEY_BACKSPACE is an int, so on systems
-             * that truly return KEY_BACKSPACE from wgetch(), we'll never
-             * catch it with erasechar() */
-            if (c == erasechar() || c == KEY_BACKSPACE)
+            if (c == erasechar())       /* backspace, ^H */
             {
                 if (bp > buf)
                 {
@@ -710,9 +705,9 @@ int weditstr(WINDOW *win, char *buf, int field)
             {
                 tp = bp;
 
-                while ((bp > buf) && (*(bp - 1) == ' '))
+                while ((bp > buf) && (*(bp - 1) == ' ')) 
                     bp--;
-                while ((bp > buf) && (*(bp - 1) != ' '))
+                while ((bp > buf) && (*(bp - 1) != ' ')) 
                     bp--;
 
                 memmove((void *)bp, (const void *)tp, strlen(tp) + 1);
@@ -723,7 +718,7 @@ int weditstr(WINDOW *win, char *buf, int field)
                 {
                     bp = buf;
                     *bp = '\0';
-                    defdisp = FALSE;
+                    defdisp = PDC_FALSE;
                 }
 
                 if (insert)
@@ -742,7 +737,7 @@ int weditstr(WINDOW *win, char *buf, int field)
 
                     if (!*bp)
                         bp[1] = '\0';
-
+            
                     *bp++ = c;
                 }
             }
@@ -777,7 +772,7 @@ int getstrings(char *desc[], char *buf[], int field)
     WINDOW *winput;
     int oldy, oldx, maxy, maxx, nlines, ncols, i, n, l, mmax = 0;
     int c = 0;
-    bool stop = FALSE;
+    PDC_bool stop = PDC_FALSE;
 
     for (n = 0; desc[n]; n++)
         if ((l = strlen(desc[n])) > mmax)
@@ -787,7 +782,7 @@ int getstrings(char *desc[], char *buf[], int field)
     getyx(wbody, oldy, oldx);
     getmaxyx(wbody, maxy, maxx);
 
-    winput = mvwinputbox(wbody, (maxy - nlines) / 2, (maxx - ncols) / 2,
+    winput = mvwinputbox(wbody, (maxy - nlines) / 2, (maxx - ncols) / 2, 
         nlines, ncols);
 
     for (i = 0; i < n; i++)
@@ -800,7 +795,7 @@ int getstrings(char *desc[], char *buf[], int field)
         switch (c = mvweditstr(winput, i+1, mmax+3, buf[i], field))
         {
         case KEY_ESC:
-            stop = TRUE;
+            stop = PDC_TRUE;
             break;
 
         case KEY_UP:
@@ -811,7 +806,7 @@ int getstrings(char *desc[], char *buf[], int field)
         case '\t':
         case KEY_DOWN:
             if (++i == n)
-                stop = TRUE;    /* all passed? */
+                stop = PDC_TRUE;    /* all passed? */
         }
     }
 

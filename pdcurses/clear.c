@@ -1,52 +1,47 @@
-/* PDCurses */
+/* Public Domain Curses */
 
 #include <curspriv.h>
 
 /*man-start**************************************************************
 
-clear
------
+  Name:                                                         clear
 
-### Synopsis
+  Synopsis:
+        int clear(void);
+        int wclear(WINDOW *win);
+        int erase(void);
+        int werase(WINDOW *win);
+        int clrtobot(void);
+        int wclrtobot(WINDOW *win);
+        int clrtoeol(void);
+        int wclrtoeol(WINDOW *win);
 
-    int clear(void);
-    int wclear(WINDOW *win);
-    int erase(void);
-    int werase(WINDOW *win);
-    int clrtobot(void);
-    int wclrtobot(WINDOW *win);
-    int clrtoeol(void);
-    int wclrtoeol(WINDOW *win);
+  Description:
+        erase() and werase() copy blanks (i.e. the background chtype) to 
+        every cell of the window.
 
-### Description
+        clear() and wclear() are similar to erase() and werase(), but
+        they also call clearok() to ensure that the the window is 
+        cleared on the next wrefresh().
 
-   erase() and werase() copy blanks (i.e. the background chtype) to
-   every cell of the window.
+        clrtobot() and wclrtobot() clear the window from the current 
+        cursor position to the end of the window.
 
-   clear() and wclear() are similar to erase() and werase(), but they
-   also call clearok() to ensure that the the window is cleared on the
-   next wrefresh().
+        clrtoeol() and wclrtoeol() clear the window from the current
+        cursor position to the end of the current line.
 
-   clrtobot() and wclrtobot() clear the window from the current cursor
-   position to the end of the window.
+  Return Value:
+        All functions return OK on success and ERR on error.
 
-   clrtoeol() and wclrtoeol() clear the window from the current cursor
-   position to the end of the current line.
-
-### Return Value
-
-   All functions return OK on success and ERR on error.
-
-### Portability
-                             X/Open  ncurses  NetBSD
-    clear                       Y       Y       Y
-    wclear                      Y       Y       Y
-    erase                       Y       Y       Y
-    werase                      Y       Y       Y
-    clrtobot                    Y       Y       Y
-    wclrtobot                   Y       Y       Y
-    clrtoeol                    Y       Y       Y
-    wclrtoeol                   Y       Y       Y
+  Portability                                X/Open    BSD    SYS V
+        clear                                   Y       Y       Y
+        wclear                                  Y       Y       Y
+        erase                                   Y       Y       Y
+        werase                                  Y       Y       Y
+        clrtobot                                Y       Y       Y
+        wclrtobot                               Y       Y       Y
+        clrtoeol                                Y       Y       Y
+        wclrtoeol                               Y       Y       Y
 
 **man-end****************************************************************/
 
@@ -89,15 +84,13 @@ int clrtoeol(void)
 
 int wclrtobot(WINDOW *win)
 {
-    int savey, savex;
+    int savey = win->_cury;
+    int savex = win->_curx;
 
     PDC_LOG(("wclrtobot() - called\n"));
 
     if (!win)
         return ERR;
-
-    savey = win->_cury;
-    savex = win->_curx;
 
     /* should this involve scrolling region somehow ? */
 
@@ -147,7 +140,7 @@ int wclear(WINDOW *win)
     if (!win)
         return ERR;
 
-    win->_clear = TRUE;
+    win->_clear = PDC_TRUE;
     return werase(win);
 }
 

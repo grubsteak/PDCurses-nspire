@@ -45,6 +45,7 @@
 /******************************************************************************/
 
 #include <curses.h>
+#include <signal.h>
 
 void lil(WINDOW *);
 void midtop(WINDOW *);
@@ -91,7 +92,7 @@ int main(int argc, char **argv)
 #else
     initscr();
 #endif
-    nodelay(stdscr, TRUE);
+    nodelay(stdscr, PDC_TRUE);
     noecho();
     nonl();
     refresh();
