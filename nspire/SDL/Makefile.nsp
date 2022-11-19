@@ -25,3 +25,6 @@ platform-clean:
 
 ./include: $(SDL_INCLUDE)
 	@cp -ar $(SDL_INCLUDE) $@
+
+install: .$(PLATFORM).stamp
+	cp -r include lib `dirname \`which nspire-gcc\``/../

@@ -4,7 +4,7 @@ RANLIB = arm-none-eabi-ranlib
 STRIP = arm-none-eabi-strip
 
 INCLUDE = -I include
-CFLAGS = -Wall -Wextra -Ofast -Wno-unused-parameter
+CFLAGS = -Wall -Wextra -Ofast -Wno-unused-parameter -Dhas_colors=_has_colors
 
 LIBS = libz.a libpng.a libjpeg.a libSDL_image.a libSDL_gfx.a
 
