@@ -1,53 +1,52 @@
 /* Public Domain Curses */
 
-#include "pdcsdl.h"
-
 #include <stdlib.h>
 #include <string.h>
 
+#include "pdcsdl.h"
+
 #ifdef CHTYPE_LONG
 
-# define A(x) ((chtype)x | A_ALTCHARSET)
+#define A(x) ((chtype)x | A_ALTCHARSET)
 
 chtype acs_map[128] =
-{
-    A(0), A(1), A(2), A(3), A(4), A(5), A(6), A(7), A(8), A(9),
-    A(10), A(11), A(12), A(13), A(14), A(15), A(16), A(17), A(18),
-    A(19), A(20), A(21), A(22), A(23), A(24), A(25), A(26), A(27),
-    A(28), A(29), A(30), A(31), ' ', '!', '"', '#', '$', '%', '&',
-    '\'', '(', ')', '*',
+    {
+        A(0), A(1), A(2), A(3), A(4), A(5), A(6), A(7), A(8), A(9),
+        A(10), A(11), A(12), A(13), A(14), A(15), A(16), A(17), A(18),
+        A(19), A(20), A(21), A(22), A(23), A(24), A(25), A(26), A(27),
+        A(28), A(29), A(30), A(31), ' ', '!', '"', '#', '$', '%', '&',
+        '\'', '(', ')', '*',
 
-    A(0x1a), A(0x1b), A(0x18), A(0x19),
+        A(0x1a), A(0x1b), A(0x18), A(0x19),
 
-    '/',
+        '/',
 
-    0xdb,
+        0xdb,
 
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=',
-    '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-    'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=',
+        '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+        'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
 
-    A(0x04), 0xb1,
+        A(0x04), 0xb1,
 
-    'b', 'c', 'd', 'e',
+        'b', 'c', 'd', 'e',
 
-    0xf8, 0xf1, 0xb0, A(0x0f), 0xd9, 0xbf, 0xda, 0xc0, 0xc5, 0x2d,
-    0x2d, 0xc4, 0x2d, 0x5f, 0xc3, 0xb4, 0xc1, 0xc2, 0xb3, 0xf3,
-    0xf2, 0xe3, 0xd8, 0x9c, 0xf9,
+        0xf8, 0xf1, 0xb0, A(0x0f), 0xd9, 0xbf, 0xda, 0xc0, 0xc5, 0x2d,
+        0x2d, 0xc4, 0x2d, 0x5f, 0xc3, 0xb4, 0xc1, 0xc2, 0xb3, 0xf3,
+        0xf2, 0xe3, 0xd8, 0x9c, 0xf9,
 
-    A(127)
-};
+        A(127)};
 
-# undef A
+#undef A
 
 #endif
 
 Uint32 pdc_lastupdate = 0;
 
-#define MAXRECT 200     /* maximum number of rects to queue up before
-                           an update is forced; the number was chosen
-                           arbitrarily */
+#define MAXRECT 200 /* maximum number of rects to queue up before \
+                       an update is forced; the number was chosen \
+                       arbitrarily */
 
 static SDL_Rect uprect[MAXRECT];       /* table of rects to update */
 static chtype oldch = (chtype)(-1);    /* current attribute */
@@ -56,10 +55,8 @@ static short foregr = -2, backgr = -2; /* current foreground, background */
 
 /* do the real updates on a delay */
 
-void PDC_update_rects(void)
-{
-    if (rectcount)
-    {
+void PDC_update_rects(void) {
+    printf("Updating rects...\n") if (rectcount) {
         /* if the maximum number of rects has been reached, we're 
            probably better off doing a full screen update */
 
@@ -71,16 +68,15 @@ void PDC_update_rects(void)
         pdc_lastupdate = SDL_GetTicks();
         rectcount = 0;
     }
+    printf("...Done updating rects\n")
 }
 
 /* set the font colors to match the chtype's attribute */
 
-static void _set_attr(chtype ch)
-{
-    ch &= (A_COLOR|A_BOLD|A_BLINK|A_REVERSE);
+static void _set_attr(chtype ch) {
+    ch &= (A_COLOR | A_BOLD | A_BLINK | A_REVERSE);
 
-    if (oldch != ch)
-    {
+    if (oldch != ch) {
         short newfg, newbg;
 
         if (SP->mono)
@@ -91,26 +87,22 @@ static void _set_attr(chtype ch)
         newfg |= (ch & A_BOLD) ? 8 : 0;
         newbg |= (ch & A_BLINK) ? 8 : 0;
 
-        if (ch & A_REVERSE)
-        {
+        if (ch & A_REVERSE) {
             short tmp = newfg;
             newfg = newbg;
             newbg = tmp;
         }
 
-        if (newfg != foregr)
-        {
-            SDL_SetPalette(pdc_font, SDL_LOGPAL, 
+        if (newfg != foregr) {
+            SDL_SetPalette(pdc_font, SDL_LOGPAL,
                            pdc_color + newfg, pdc_flastc, 1);
             foregr = newfg;
         }
 
-        if (newbg != backgr)
-        {
+        if (newbg != backgr) {
             if (newbg == -1)
                 SDL_SetColorKey(pdc_font, SDL_SRCCOLORKEY, 0);
-            else
-            {
+            else {
                 if (backgr == -1)
                     SDL_SetColorKey(pdc_font, 0, 0);
 
@@ -127,8 +119,7 @@ static void _set_attr(chtype ch)
 
 /* draw a cursor at (y, x) */
 
-void PDC_gotoyx(int row, int col)
-{
+void PDC_gotoyx(int row, int col) {
     SDL_Rect src, dest;
     chtype ch;
     int oldrow, oldcol;
@@ -172,8 +163,7 @@ void PDC_gotoyx(int row, int col)
 
     SDL_BlitSurface(pdc_font, &src, pdc_screen, &dest);
 
-    if (oldrow != row || oldcol != col)
-    {
+    if (oldrow != row || oldcol != col) {
         if (rectcount == MAXRECT)
             PDC_update_rects();
 
@@ -183,15 +173,13 @@ void PDC_gotoyx(int row, int col)
 
 /* handle the A_*LINE attributes */
 
-static void _highlight(SDL_Rect *src, SDL_Rect *dest, chtype ch)
-{
+static void _highlight(SDL_Rect *src, SDL_Rect *dest, chtype ch) {
     short col = SP->line_color;
 
     if (SP->mono)
         return;
 
-    if (ch & A_UNDERLINE)
-    {
+    if (ch & A_UNDERLINE) {
         if (col != -1)
             SDL_SetPalette(pdc_font, SDL_LOGPAL,
                            pdc_color + col, pdc_flastc, 1);
@@ -212,8 +200,7 @@ static void _highlight(SDL_Rect *src, SDL_Rect *dest, chtype ch)
                            pdc_color + foregr, pdc_flastc, 1);
     }
 
-    if (ch & (A_LEFTLINE|A_RIGHTLINE))
-    {
+    if (ch & (A_LEFTLINE | A_RIGHTLINE)) {
         if (col == -1)
             col = foregr;
 
@@ -222,8 +209,7 @@ static void _highlight(SDL_Rect *src, SDL_Rect *dest, chtype ch)
         if (ch & A_LEFTLINE)
             SDL_FillRect(pdc_screen, dest, pdc_mapped[col]);
 
-        if (ch & A_RIGHTLINE)
-        {
+        if (ch & A_RIGHTLINE) {
             dest->x += pdc_fwidth - 1;
             SDL_FillRect(pdc_screen, dest, pdc_mapped[col]);
             dest->x -= pdc_fwidth - 1;
@@ -236,8 +222,7 @@ static void _highlight(SDL_Rect *src, SDL_Rect *dest, chtype ch)
 /* update the given physical line to look like the corresponding line in
    curscr */
 
-void PDC_transform_line(int lineno, int x, int len, const chtype *srcp)
-{
+void PDC_transform_line(int lineno, int x, int len, const chtype *srcp) {
     SDL_Rect src, dest, lastrect;
     int j;
 
@@ -261,21 +246,17 @@ void PDC_transform_line(int lineno, int x, int len, const chtype *srcp)
     if (rectcount)
         lastrect = uprect[rectcount - 1];
 
-    if (rectcount && lastrect.x == dest.x && lastrect.w == dest.w)
-    {
+    if (rectcount && lastrect.x == dest.x && lastrect.w == dest.w) {
         if (lastrect.y + lastrect.h == dest.y)
             uprect[rectcount - 1].h = lastrect.h + pdc_fheight;
-        else
-            if (lastrect.y != dest.y)
-                uprect[rectcount++] = dest;
-    } 
-    else
+        else if (lastrect.y != dest.y)
+            uprect[rectcount++] = dest;
+    } else
         uprect[rectcount++] = dest;
 
     dest.w = pdc_fwidth;
 
-    for (j = 0; j < len; j++)
-    {
+    for (j = 0; j < len; j++) {
         chtype ch = srcp[j];
 
         _set_attr(ch);
@@ -291,7 +272,7 @@ void PDC_transform_line(int lineno, int x, int len, const chtype *srcp)
 
         SDL_LowerBlit(pdc_font, &src, pdc_screen, &dest);
 
-        if (ch & (A_UNDERLINE|A_LEFTLINE|A_RIGHTLINE))
+        if (ch & (A_UNDERLINE | A_LEFTLINE | A_RIGHTLINE))
             _highlight(&src, &dest, ch);
 
         dest.x += pdc_fwidth;

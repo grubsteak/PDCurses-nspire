@@ -3,10 +3,6 @@
 #include <SDL/SDL.h>
 #include <curspriv.h>
 
-// 0x900D0000 is 100hz timer. Hopefully this won't screw stuff up.
-// #define SDL_GetTicks() (Uint32)(*((unsigned short *)0x900D0000) * 10)
-#define SDL_GetTicks() 0
-
 PDCEX SDL_Surface *pdc_screen, *pdc_font, *pdc_icon, *pdc_back;
 PDCEX int pdc_sheight, pdc_swidth, pdc_yoffset, pdc_xoffset;
 

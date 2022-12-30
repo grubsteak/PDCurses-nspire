@@ -102,15 +102,15 @@ void PDC_set_keyboard_binary(PDC_bool on) {
 /* check if a key or mouse event is waiting */
 
 PDC_bool PDC_check_key(void) {
-    Uint32 current = 0;  // SDL_GetTicks();
+    Uint32 current = SDL_GetTicks();
     int haveevent = SDL_PollEvent(&event);
 
     /* if we have an event, or 30 ms have passed without a screen 
        update, or the timer has wrapped, update now */
 
-    /* if (haveevent ||
-        current < pdc_lastupdate || ((current - pdc_lastupdate) > 30)) */
-    PDC_update_rects();
+    if (haveevent ||
+        current < pdc_lastupdate || ((current - pdc_lastupdate) > 30))
+        PDC_update_rects();
 
     return haveevent;
 }
