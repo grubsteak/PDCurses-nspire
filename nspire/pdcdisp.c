@@ -56,7 +56,7 @@ static short foregr = -2, backgr = -2; /* current foreground, background */
 /* do the real updates on a delay */
 
 void PDC_update_rects(void) {
-    printf("Updating rects...\n") if (rectcount) {
+    if (rectcount) {
         /* if the maximum number of rects has been reached, we're 
            probably better off doing a full screen update */
 
@@ -68,7 +68,6 @@ void PDC_update_rects(void) {
         pdc_lastupdate = SDL_GetTicks();
         rectcount = 0;
     }
-    printf("...Done updating rects\n")
 }
 
 /* set the font colors to match the chtype's attribute */
