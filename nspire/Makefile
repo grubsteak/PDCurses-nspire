@@ -21,7 +21,7 @@ SFLAGS		+= -DHAVE_VSNPRINTF -DHAVE_VSSCANF
 ifeq ($(DEBUG),Y)
 	CFLAGS  = -g -Wall -DPDCDEBUG
 else
-	CFLAGS  = -O2 -Wall
+	CFLAGS  = -Ofast -Wall
 endif
 
 
