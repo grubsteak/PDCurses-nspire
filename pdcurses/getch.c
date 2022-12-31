@@ -1,6 +1,7 @@
 /* Public Domain Curses */
 
 #include <curspriv.h>
+#include <libndls.h>
 
 /*man-start**************************************************************
 
@@ -210,7 +211,8 @@ int wgetch(WINDOW *win) {
             } else if (win->_nodelay)
                 return ERR;
 
-            napms(50); /* sleep for 1/20th second */ /************************* lag? *****************************/
+            // napms(50); /* sleep for 1/20th second */ 
+            idle();
             continue;                                /* then check again */
         }
 
