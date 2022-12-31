@@ -212,6 +212,7 @@ int doupdate(void)
     SP->cursrow = curscr->_cury;
     SP->curscol = curscr->_curx;
 
+    PDC_update_rects(); /* actually update the screen */
     return OK;
 }
 
