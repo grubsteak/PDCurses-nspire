@@ -60,10 +60,10 @@ void PDC_update_rects(void) {
         /* if the maximum number of rects has been reached, we're 
            probably better off doing a full screen update */
 
-        if (rectcount == MAXRECT)
+        // if (rectcount == MAXRECT)
             SDL_Flip(pdc_screen);
-        else
-            SDL_UpdateRects(pdc_screen, rectcount, uprect);
+        // else
+        //     SDL_UpdateRects(pdc_screen, rectcount, uprect);
 
         pdc_lastupdate = SDL_GetTicks();
         rectcount = 0;
