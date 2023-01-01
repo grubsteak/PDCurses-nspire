@@ -1,4 +1,5 @@
 # Makefile for PDCurses library for SDL
+NDLESS_HOME = $(shell dirname `which $(CC)`)/..
 
 O = o
 
@@ -41,7 +42,7 @@ CFLAGS		+= -DPDC_WIDE
 DEMOS		= firework newdemo ptest rain testcurs tuidemo worm xmas \
 sdltest
 
-.PHONY: all libs clean demos
+.PHONY: all libs clean demos install
 
 all: libs demos
 
@@ -49,6 +50,12 @@ libs:	$(LIBCURSES)
 
 clean:
 	-rm -rf *.o trace $(LIBCURSES) $(DEMOS)
+
+install: $(LIBCURSES)
+	cp $^ $(NDLESS_HOME)/lib
+	cp curses.h ncurses.h $(NDLESS_HOME)/include
+	cp ncursesw5-config $(NDLESS_HOME)/bin
+
 
 demos:	$(DEMOS)
 	arm-none-eabi-strip $(DEMOS)
