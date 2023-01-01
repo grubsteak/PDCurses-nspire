@@ -53,7 +53,7 @@ clean:
 
 install: $(LIBCURSES)
 	cp $^ $(NDLESS_HOME)/lib
-	cp ../curses.h ../ncurses.h $(NDLESS_HOME)/include
+	cp ../curses.h ../ncurses.h ../term.h ../panel.h $(NDLESS_HOME)/include
 	cp ../ncursesw5-config $(NDLESS_HOME)/bin
 
 
