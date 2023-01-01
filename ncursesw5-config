@@ -114,11 +114,11 @@ ENDECHO
 		#LIBS=" -ldl"
 		if test tinfo = ncurses ; then
 		sed -e 's,^[ ]*,,' -e 's, [ ]*, ,g' -e 's,[ ]*$,,' <<-ENDECHO
-			-L${LIBDIR} -lncursesw5 $LIBS
+			-lncursesw5 $LIBS
 ENDECHO
 		else
 		sed -e 's,^[ ]*,,' -e 's, [ ]*, ,g' -e 's,[ ]*$,,' <<-ENDECHO
-			-L${LIBDIR} -lncursesw5 $LIBS
+			-lncursesw5 $LIBS
 ENDECHO
 		fi
 		;;
